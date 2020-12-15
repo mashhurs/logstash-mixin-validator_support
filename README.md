@@ -55,4 +55,9 @@ When developing back-ports, sometimes it may not be possible to provide a
 verbatim validation. In these cases, developers should err on the side of the
 back-port accepting input that the core implementation may consider invalid.
 
+Each time a new validator is added, the runtime dependency of this library on
+Logstash core should be updated to require a minimium of the OLDEST supported
+release. This allows plugins using this adapter to supply patch-level fixes to
+any supported Logstash version without maintaining multiple branches.
+
 [pessimistic operator]: https://thoughtbot.com/blog/rubys-pessimistic-operator
