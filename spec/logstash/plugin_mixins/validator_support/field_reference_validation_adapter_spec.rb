@@ -28,6 +28,16 @@ describe LogStash::PluginMixins::ValidatorSupport::FieldReferenceValidationAdapt
       end
     end
 
+    context "valid input `''`" do
+      # failed in version 1.0.x which was not compatible with LS 7.x behavior
+      it 'correctly reports the value as valid' do
+        is_valid_result, coerced_or_error = described_class.validate ['']
+
+        expect(is_valid_result).to be true
+        expect(coerced_or_error).to be nil
+      end
+    end
+
     [
       ['link[0]'],
       ['][N\\//\\L][D'],
