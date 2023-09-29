@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'logstash/plugin_mixins/validator_support/host_port_pair_validation_adapter'
+require 'logstash/plugin_mixins/validator_support/required_host_optional_port_validation_adapter'
 
 describe LogStash::PluginMixins::ValidatorSupport::RequiredHostOptionalPortValidationAdapter do
 
@@ -33,12 +33,38 @@ describe LogStash::PluginMixins::ValidatorSupport::RequiredHostOptionalPortValid
       "[::ffff:93.184.216.34]" => {:host => "::ffff:93.184.216.34", :port => nil},
     }.each do |candidate, expected_result|
       context "valid input `#{candidate.inspect}`" do
-        it 'coerces the result to a host/port struct' do
+        it "coerces the result to a host/port struct `#{expected_result}`" do
           is_valid_result, coerced_or_error = described_class.validate([candidate])
+          failure = is_valid_result ? nil : coerced_or_error
+          coerced = is_valid_result ? coerced_or_error : nil
+
           aggregate_failures do
             expect(is_valid_result).to be true
-            expect(coerced_or_error).to have_attributes(expected_result.to_h)
+            expect(failure).to be_nil # makes spec failure output useful
           end
+          expect(coerced).to have_attributes(expected_result.to_h)
+        end
+      end
+    end
+
+    [
+      "not an address",
+      "http://example.com:1234",
+      "tcp://example.com",
+      "http://example.com:1234/v1/this",
+      "",
+    ].each do |candidate|
+      context "invalid input `#{candidate.inspect}`" do
+        it "reports the input as invalid" do
+          is_valid_result, coerced_or_error = described_class.validate([candidate])
+          failure = is_valid_result ? nil : coerced_or_error
+          coerced = is_valid_result ? coerced_or_error : nil
+
+          aggregate_failures do
+            expect(is_valid_result).to be false
+            expect(coerced).to be_nil # makes spec failure output useful
+          end
+          expect(failure).to_not be_nil
         end
       end
     end
