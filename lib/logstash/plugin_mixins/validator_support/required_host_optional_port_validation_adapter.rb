@@ -19,13 +19,10 @@ module LogStash
 
         candidate = value.first
 
-        break ValidationResult.failure("Expected a valid #{expectation_desc}, got `#{candidate.inspect}`") unless candidate.kind_of?(String)
-
-        # bare ipv6, no port provided
-        break ValidationResult.success(host_port_pair.new(candidate, nil)) if Resolv::IPv6::Regex.match? candidate
+        break ValidationResult.failure("Expected a valid #{expectation_desc}, got `#{candidate.inspect}`") unless candidate.kind_of?(String) && !candidate.empty?
 
         # optional port
-        candidate_host, candidate_port = candidate.split(%r{\:(?=\d{1,5}\z)})
+        candidate_host, candidate_port = candidate.split(%r{\:(?=\d{1,5}\z)},2)
         port = candidate_port&.to_i
 
         # bracket-wrapped ipv6
