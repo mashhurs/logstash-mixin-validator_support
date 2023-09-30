@@ -55,6 +55,7 @@ describe LogStash::PluginMixins::ValidatorSupport::RequiredHostOptionalPortValid
       "2001:db8:3333::7777:8888",
       "[1:2:3:4:5:6::7:8:9:a:b:c]", # invalid compressed hex ipv6 form
       "[::ffff:258.512.768.999]", # invalid compressed hex4dec ipv6 form
+      "example.com:98000",
     ].each do |candidate|
       context "invalid input `#{candidate.inspect}`" do
         it "reports the input as invalid" do
